@@ -1,5 +1,11 @@
 💼 Desafio Técnico - Controle de Produtos e Estoque
 
+📌 Como Participar
+  Fork este repositório para a sua conta do GitHub.
+  Desenvolva a solução no seu fork.
+  Após finalizar, abra um Pull Request (PR) para este repositório.
+  Aguarde o feedback da equipe.
+
 🎯 Objetivo
   Desenvolver uma aplicação 'Windows Forms' em C# que permita:
   Cadastrar produtos com suas respectivas informações
