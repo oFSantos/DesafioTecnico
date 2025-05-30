@@ -13,39 +13,35 @@ Validação de regras de negócio como saldo insuficiente
 
 🧠 Funcionalidades
 1. Cadastro de Produto
-Tela com formulário e persistência via API contendo os campos:
-Código
-Descrição
-Tipo de Produto (Eletrônico, Eletrodoméstico, Móvel)
-Valor do Fornecedor
-Quantidade em Estoque (valor inicial)
+2. Tela com formulário e persistência via API contendo os campos como por exemplo: Código, Descrição, Tipo de Produto (Eletrônico, Eletrodoméstico, Móvel), Valor do Fornecedor,
+ Quantidade em Estoque (valor inicial)
 
-2. Entrada de Estoque
-Seleção de produto existente
-Campo para quantidade a adicionar
-Atualização do valor do fornecedor
+4. Entrada de Estoque
+Seleção de produto existente,
+Campo para quantidade a adicionar,
+Atualização do valor do fornecedor,
 Chamada à API para registrar a entrada
 
-4. Saída de Estoque
-Seleção de produto
-Campo para quantidade de saída
-Campo para valor de venda
-Validação de saldo disponível
+5. Saída de Estoque
+Seleção de produto,
+Campo para quantidade de saída,
+Campo para valor de venda,
+Validação de saldo disponível,
 Registro da movimentação via API
 
 🧪 Regras de Negócio - Não permitir saída de estoque com quantidade maior do que o disponível
 Toda saída deve registrar:
-Valor de Venda
-Data da Movimentação
+Valor de Venda,
+Data da Movimentação,
 Quantidade
 
 💾 Armazenamento - Use o banco de dados de sua preferência: PostgreSQL, MySQL ou SQL Server.
 
 🧰 Sugestão de Telas (Frontend Vue.js) - Tela Principal com Menu de Navegação
-Cadastro de Produto
-Movimentação de Estoque com abas:
-Entrada
-Saída
+Cadastro de Produto,
+Movimentação de Estoque com abas,
+Entrada,
+Saída,
 Histórico de Movimentações
 
 📝 Avaliação - Critérios sugeridos:
