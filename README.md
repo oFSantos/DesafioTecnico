@@ -1,3 +1,11 @@
+💼 Desafio Técnico - Controle de Produtos e Estoque
+
+📌 Como Participar
+  Faça um fork deste repositório em sua conta do GitHub.
+  Desenvolva a solução no seu fork.
+  Após finalizar, abra um Pull Request (PR) para este repositório.
+  Aguarde o feedback da equipe.
+
 🎯 Objetivo
 Desenvolver uma aplicação full stack com:
 
