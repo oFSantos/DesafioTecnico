@@ -1,7 +1,6 @@
 💼 Desafio Técnico - Controle de Produtos e Estoque
 
 📌 Como Participar
-
   Fork este repositório para a sua conta do GitHub.
   Desenvolva a solução no seu fork.
   Após finalizar, abra um Pull Request (PR) para este repositório.
