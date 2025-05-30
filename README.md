@@ -16,32 +16,21 @@ Validação de regras de negócio como saldo insuficiente
  Quantidade em Estoque (valor inicial)
 
 4. Entrada de Estoque
-Seleção de produto existente,
-Campo para quantidade a adicionar,
-Atualização do valor do fornecedor,
-Chamada à API para registrar a entrada
+Seleção de produto existente, campo para quantidade a adicionar e atualização do valor do fornecedor.
 
 5. Saída de Estoque
-Seleção de produto,
-Campo para quantidade de saída,
-Campo para valor de venda,
-Validação de saldo disponível,
-Registro da movimentação via API
+Seleção de produto, campo para quantidade de saída, campo para valor de venda, validação de saldo disponível.
 
-🧪 Regras de Negócio - Não permitir saída de estoque com quantidade maior do que o disponível
-Toda saída deve registrar:
-Valor de Venda,
-Data da Movimentação,
-Quantidade
+🧪 Regras de Negócio - Não permitir saída de estoque com quantidade maior do que o disponível. Toda saída deve registrar: valor de Venda, data da Movimentação, quantidade
 
 💾 Armazenamento - Use o banco de dados de sua preferência: PostgreSQL, MySQL ou SQL Server.
 
 🧰 Sugestão de Telas (Frontend Vue.js) - Tela Principal com Menu de Navegação
-Cadastro de Produto,
-Movimentação de Estoque com abas,
-Entrada,
-Saída,
-Histórico de Movimentações
+cadastro de Produto,
+movimentação de Estoque com abas,
+entrada,
+saída,
+histórico de Movimentações                                                                                                                                                                                                                           
 
 📝 Avaliação - Critérios sugeridos:
 Organização do código (separação clara entre backend e frontend)
