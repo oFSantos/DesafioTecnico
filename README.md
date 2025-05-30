@@ -12,8 +12,7 @@ Controle de produtos e movimentações de estoque (entradas e saídas)
 Validação de regras de negócio como saldo insuficiente
 
 🧠 Funcionalidades
-1. Cadastro de Produto
-2. Tela com formulário e persistência via API contendo os campos como por exemplo: Código, Descrição, Tipo de Produto (Eletrônico, Eletrodoméstico, Móvel), Valor do Fornecedor,
+1. Cadastro de Produto contendo os seguintes campos: Código, Descrição, Tipo de Produto (Eletrônico, Eletrodoméstico, Móvel), Valor do Fornecedor,
  Quantidade em Estoque (valor inicial)
 
 4. Entrada de Estoque
