@@ -39,7 +39,6 @@ Seleção de produto, campo para quantidade de saída, campo para valor de venda
 📝 Avaliação - Critérios sugeridos:Organização do código (separação clara entre backend e frontend)
 - Adoção de boas práticas (ex: camadas de serviço, DTOs, controllers no backend)
 - Validações de dados no backend e frontend			
-- Documentação da API (Swagger ou equivalente)
 - Clareza na estrutura de componentes Vue.js
 - UX/UI básica mas funcional
 - Tratamento de erros e mensagens amigáveis
