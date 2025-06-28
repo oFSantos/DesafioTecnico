@@ -1,5 +1,5 @@
 ﻿using ErpProdutos.Config;
-using ErpProdutos.Domain.Enitities;
+using ErpProdutos.Domain.Entities;
 using ErpProdutos.Domain.Interfaces;
 using ErpProdutos.Domain.Interfaces.Repositorio;
 using System;

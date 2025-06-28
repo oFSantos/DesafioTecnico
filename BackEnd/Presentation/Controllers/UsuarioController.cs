@@ -1,4 +1,4 @@
-using ErpProdutos.Domain.Enitities;
+using ErpProdutos.Domain.Entities;
 using ErpProdutos.Domain.Interfaces;
 using ErpProdutos.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;

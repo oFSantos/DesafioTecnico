@@ -1,36 +1,58 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ErpProdutos.Domain.Enitities;
+﻿using ErpProdutos.Domain.Entities;
 using ErpProdutos.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
 
-public class RepositorioEstoque : IRepositorioEstoque
+public class EstoqueRepository : IRepositorioEstoque
 {
-    private readonly ErpProdutosContext _contexto;
+    private readonly ErpProdutosContext _context;
 
-    public RepositorioEstoque(ErpProdutosContext contexto)
+    public EstoqueRepository(ErpProdutosContext context)
     {
-        _contexto = contexto;
+        _context = context;
     }
 
-    public bool CadastrarProduto(Guid idProduto, int qnt)
+    public async Task<bool> CadastrarProduto(Guid idProduto, int qnt)
     {
-        throw new NotImplementedException();
+        var estoque = new EntidadeEstoque
+        {
+            ProdutoId = idProduto,
+            Quantidade = qnt
+        };
+        await _context.Estoque.AddAsync(estoque);
+        return await _context.SaveChangesAsync() > 0;
     }
 
-    public List<EntidadeEstoque> ConsultarEstoque()
+    public async Task<bool> AtualizarEstoque(Guid idProduto, int novaQuantidade)
     {
-        throw new NotImplementedException();
+        var estoque = await _context.Estoque.FirstOrDefaultAsync(e => e.ProdutoId == idProduto);
+        if (estoque == null)
+            return false;
+
+        estoque.Quantidade = novaQuantidade;
+        return await _context.SaveChangesAsync() > 0;
     }
 
-    public List<EntidadeEstoque> ConsultarEstoque(Guid idProduto)
+    public async Task<bool> DeletarProduto(Guid idProduto, int qnt)
     {
-        throw new NotImplementedException();
+        var estoque = await _context.Estoque
+            .FirstOrDefaultAsync(e => e.ProdutoId == idProduto);
+        if (estoque == null || estoque.Quantidade < qnt) return false;
+
+        estoque.Quantidade -= qnt;
+        return await _context.SaveChangesAsync() > 0;
     }
 
-    public bool DeletarProduto(Guid idProduto, int qnt)
+    public async Task<List<EntidadeEstoque>> ConsultarEstoque()
     {
-        throw new NotImplementedException();
+        return await _context.Estoque.ToListAsync();
     }
+
+    public async Task<List<EntidadeEstoque>> ConsultarEstoque(Guid idProduto)
+    {
+        return await _context.Estoque
+            .Where(e => e.ProdutoId == idProduto)
+            .ToListAsync();
+    }
+
 }

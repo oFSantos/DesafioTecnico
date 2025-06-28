@@ -1,6 +1,7 @@
 ﻿using ErpProdutos.Config;
 using ErpProdutos.Domain.Interfaces.Repositorio;
 using ErpProdutos.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -19,7 +20,7 @@ public class AutenticationController : ControllerBase
         _configuration = configuration;
         _usuarioRepository = usuarioRepository;
     }
-
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel login)
     {

@@ -1,12 +1,12 @@
 ﻿using ErpProdutos.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace ErpProdutos.Domain.Enitities
+namespace ErpProdutos.Domain.Entities
 {
     public class EntidadeMovimentacaoEstoque
     {
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
         
         [Required]
         public Guid ProdutoId { get; set; }
@@ -14,7 +14,7 @@ namespace ErpProdutos.Domain.Enitities
         public int Quantidade { get; set; } = 0;
         public decimal ValorVenda { get; set; } = 0;
         public decimal ValorFornecedor { get; set; } = 0;
-        public DateTime Data { get; set; } = DateTime.UtcNow;
+        public DateTime DataMovimentacao { get; set; } = DateTime.UtcNow;
 
 
     }

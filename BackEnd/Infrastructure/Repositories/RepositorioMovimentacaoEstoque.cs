@@ -1,27 +1,30 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ErpProdutos.Domain.Enitities;
+﻿using ErpProdutos.Domain.Entities;
 using ErpProdutos.Domain.Enums;
 using ErpProdutos.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
 
-public class RepositorioMovimentacaoEstoque : IRepositorioMovimentacaoEstoque
+public class MovimentacaoEstoqueRepository : IRepositorioMovimentacaoEstoque
 {
-    private readonly ErpProdutosContext _contexto;
+    private readonly ErpProdutosContext _context;
 
-    public RepositorioMovimentacaoEstoque(ErpProdutosContext contexto)
+    public MovimentacaoEstoqueRepository(ErpProdutosContext context)
     {
-        _contexto = contexto;
+        _context = context;
     }
 
-    public bool ListarMovimentacaoEstoque(TipoMovimento tipoMovimento)
+    public async Task<bool> RegistrarMovimentacaoEstoque(EntidadeMovimentacaoEstoque movimentacao)
     {
-        throw new NotImplementedException();
+        await _context.MovimentacaoEstoque.AddAsync(movimentacao);
+        return await _context.SaveChangesAsync() > 0;
     }
 
-    public bool RegistrarMovimentacaoEstoque(EntidadeMovimentacaoEstoque movimentacao)
+    public async Task<List<EntidadeMovimentacaoEstoque>> ListarMovimentacaoEstoque(TipoMovimento tipoMovimento)
     {
-        throw new NotImplementedException();
+        return await _context.MovimentacaoEstoque
+            .Where(m => m.TipoMovimentacao == tipoMovimento)
+            .ToListAsync();
     }
+
+ 
 }

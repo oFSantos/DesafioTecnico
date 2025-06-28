@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using ErpProdutos.Domain.Enitities;
+using ErpProdutos.Domain.Entities;
 using ErpProdutos.Domain.Interfaces.Repositorio;
 using ErpProdutos.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

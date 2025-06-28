@@ -1,61 +1,60 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ErpProdutos.Domain.Enitities;
+﻿using ErpProdutos.Domain.Entities;
 using ErpProdutos.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
 
-public class RepositorioProduto : IRepositorioProduto
+public class ProdutoRepository : IRepositorioProduto
 {
-    private readonly ErpProdutosContext _contexto;
+    private readonly ErpProdutosContext _context;
 
-    public RepositorioProduto(ErpProdutosContext contexto)
+    public ProdutoRepository(ErpProdutosContext context)
     {
-        _contexto = contexto;
+        _context = context;
     }
 
-    //public async Task SalvarMensagemAsync(EntidadeProduto mensagem)
-    //{
-    //    _contexto.Mensagens.Add(mensagem);
-    //    await _contexto.SaveChangesAsync();
-    //}
-
-    //public async Task<List<EntidadeProduto>> ObterHistoricoAsync(string remetente, string destinatario)
-    //{
-    //    return await _contexto.Mensagens
-    //        .Where(m => (m.Remetente == remetente && m.Destinatario == destinatario) ||
-    //                    (m.Remetente == destinatario && m.Destinatario == remetente))
-    //        .OrderBy(m => m.EnviadaEm)
-    //        .ToListAsync();
-    //}
-
-    public bool CadastrarProduto(EntidadeProduto produto)
+    public async Task<bool> CadastrarProduto(EntidadeProduto produto)
     {
-        throw new NotImplementedException();
+        await _context.Produto.AddAsync(produto);
+        return await _context.SaveChangesAsync() > 0;
     }
 
-    public bool AtualizarProduto(EntidadeProduto produto)
+    public async Task<bool> AtualizarProduto(EntidadeProduto produto)
     {
-        throw new NotImplementedException();
+        _context.Produto.Update(produto);
+        return await _context.SaveChangesAsync() > 0;
     }
 
-    public bool DeletarProduto(Guid idProduto)
+    public async Task<bool> DeletarProduto(Guid idProduto)
     {
-        throw new NotImplementedException();
+        var produto = await _context.Produto.FindAsync(idProduto);
+        if (produto == null) return false;
+        _context.Produto.Remove(produto);
+        return await _context.SaveChangesAsync() > 0;
     }
 
-    public EntidadeProduto BuscarProduto(Guid idProduto)
+    public async Task<EntidadeProduto> BuscarProduto(Guid idProduto)
+
     {
-        throw new NotImplementedException();
+        return await _context.Produto
+            .FirstOrDefaultAsync(p => p.Id == idProduto);
     }
 
-    public EntidadeProduto BuscarProduto(string codigo)
+    public async Task<EntidadeProduto> BuscarProduto(string codigo)
     {
-        throw new NotImplementedException();
+        return await _context.Produto
+            .FirstOrDefaultAsync(p => p.Codigo == codigo);
     }
 
-    public List<EntidadeProduto> BuscarProdutos(string descricao)
+    public async Task<List<EntidadeProduto>> BuscarProdutos(string descricao)
     {
-        throw new NotImplementedException();
+        return await _context.Produto
+            .Where(p => p.Descricao.Contains(descricao))
+            .ToListAsync();
     }
+    public async Task<IEnumerable<EntidadeProduto>> ListarProdutos()
+    {
+        return await _context.Produto.ToListAsync();
+    }
+
+
 }

@@ -1,14 +1,18 @@
-﻿using ErpProdutos.Domain.Enitities;
+﻿using ErpProdutos.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 public interface IRepositorioProduto
 {
-    public bool CadastrarProduto(EntidadeProduto produto);
-    public bool AtualizarProduto(EntidadeProduto produto);
-    public bool DeletarProduto(Guid idProduto);
+    public Task<bool> CadastrarProduto(EntidadeProduto produto);
+    public Task<bool> AtualizarProduto(EntidadeProduto produto);
+    public Task<bool> DeletarProduto(Guid idProduto);
 
-    public EntidadeProduto BuscarProduto(Guid idProduto);
-    public EntidadeProduto BuscarProduto(string codigo);
-    public List<EntidadeProduto> BuscarProdutos(string descricao);
+    public Task<EntidadeProduto> BuscarProduto(Guid idProduto);
+    public Task<EntidadeProduto> BuscarProduto(string codigo);
+    public Task<List<EntidadeProduto>> BuscarProdutos(string descricao);
+
+    public Task<IEnumerable<EntidadeProduto>> ListarProdutos();
+
+
 }

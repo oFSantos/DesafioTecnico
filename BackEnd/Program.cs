@@ -1,17 +1,25 @@
 using ErpProdutos.Infrastructure.CrossCutting;
 using ErpProdutos.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
+using Npgsql;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseUrls("http://+:80");
 
+//Add Services
 builder.Services.AddControllers();
+
+// Swagger com autenticação JWT
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ERP Produtos API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -22,7 +30,6 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
 
-
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -32,20 +39,14 @@ builder.Services.AddSwaggerGen(c =>
                 {
                     Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
-                },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header,
+                }
             },
             new List<string>()
         }
     });
 });
 
-// Adiciona os serviços crosscutting (incluindo a conexão com o PostgreSQL)
-builder.Services.AddCrossCuttingServices(builder.Configuration);
-
-// Configuração do JWT
+//JWT Configuration
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["Secret"];
 
@@ -68,31 +69,77 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+//CrossCutting: DbContext, Repositories, Services, SignalR...
+builder.Services.AddCrossCuttingServices(builder.Configuration);
+
+//CORS (Se quiser liberar pro frontend depois)
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("CorsPolicy", builder => 
+//         builder.AllowAnyOrigin()
+//                .AllowAnyMethod()
+//                .AllowAnyHeader());
+// });
+
+
+var corsPolicy = "CorsPolicy";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: corsPolicy,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
-app.UseRouting();
 
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
-
-//app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ErpProdutosContext>();
-    dbContext.Database.Migrate();
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<ErpProdutosContext>();
+
+    var retry = 0;
+    var maxRetries = 10;
+    var delay = 3000; // 3 segundos
+
+    while (retry < maxRetries)
+    {
+        try
+        {
+            Console.WriteLine("Tentando conectar ao banco...");
+            dbContext.Database.Migrate();
+            Console.WriteLine(" Banco conectado e migrations aplicadas.");
+            break;
+        }
+        catch (NpgsqlException ex)
+        {
+            if (retry == maxRetries)
+            {
+                Console.WriteLine("Não foi possível conectar ao banco após várias tentativas.");
+                throw;
+            }
+            retry++;
+            Console.WriteLine($"Banco não está pronto... tentativa {retry}/{maxRetries}");
+            Thread.Sleep(delay);
+        }
+     }
 }
 
-//Adiciona endpoint chatHub
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers(); 
-    endpoints.MapHub<ChatHub>("/chatHub"); 
-});
+
+
+
+app.UseMiddleware<ExceptionMiddleware>(); // Tratamento global de erros
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseAuthentication();
+app.UseCors(corsPolicy);
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();

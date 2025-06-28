@@ -1,4 +1,4 @@
-﻿using ErpProdutos.Domain.Enitities;
+﻿using ErpProdutos.Domain.Entities;
 using System.Text;
 
 namespace ErpProdutos.Domain.Interfaces

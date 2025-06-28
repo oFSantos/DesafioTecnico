@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ErpProdutos.Domain.Enitities
+namespace ErpProdutos.Domain.Entities
 {    
     public class EntidadeUsuario
     {

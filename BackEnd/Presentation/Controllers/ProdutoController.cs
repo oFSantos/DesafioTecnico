@@ -1,74 +1,92 @@
-﻿using ErpProdutos.Domain.Enitities;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 [ApiController]
-[Route("api/erpProdutos")]
+[Route("api/[controller]")]
 public class ProdutoController : ControllerBase
 {
-    private readonly IHubContext<ChatHub> _hubContext;
-    private readonly IRepositorioMensagem _repositorioMensagem;
+    private readonly IProdutoService _produtoService;
 
-   
-    public ProdutoController(IHubContext<ChatHub> hubContext,IRepositorioMensagem repositorioMensagem)
+    public ProdutoController(IProdutoService produtoService)
     {
-        _hubContext = hubContext;
-        _repositorioMensagem = repositorioMensagem;
+        _produtoService = produtoService;
     }
 
-    /// <summary>
-    /// Envia uma mensagem para um usuário específico via SignalR. Precisa estar autenticado
-    /// </summary>
-    /// 
-
+    [HttpPost]
     [Authorize]
-    [HttpPost("enviar")]
-    public async Task<IActionResult> EnviarMensagem([FromBody] MensagemDto mensagemDto)
+    public async Task<IActionResult> Cadastrar([FromBody] ProdutoRequestDTO dto)
     {
-        
-        await _hubContext.Clients.All.SendAsync("ReceberMensagem", mensagemDto.Remetente, mensagemDto.Conteudo);
-        
-        await _repositorioMensagem.SalvarMensagemAsync(new EntidadeProduto { Remetente = mensagemDto.Remetente, Conteudo = mensagemDto.Conteudo, Destinatario = mensagemDto.Destinatario });
+        var entidade = dto.ToEntity();
 
-        return Ok("Mensagem enviada via SignalR.");
+        var sucesso = await _produtoService.CadastrarProduto(entidade);
+        if (!sucesso) return BadRequest("Erro ao cadastrar produto.");
+
+        return Ok(entidade.ToResponseDTO());
     }
 
-    /// <summary>
-    /// Consulta histórico de mensagens. Precisa estar autenticado
-    /// </summary>
+    [HttpPut("{id}")]
     [Authorize]
-    [HttpGet("historico")]
-    public async Task<IActionResult> ObterHistoricoMensagens([FromQuery] string remetente, [FromQuery] string destinatario)
+    public async Task<IActionResult> Atualizar(Guid id, [FromBody] ProdutoRequestDTO dto)
     {
-        if (string.IsNullOrEmpty(remetente) || string.IsNullOrEmpty(destinatario))
-            return BadRequest("Os parâmetros 'remetente' e 'destinatario' são obrigatórios.");
+        var produtoExistente = await _produtoService.BuscarProduto(id);
+        if (produtoExistente == null) return NotFound("Produto não encontrado.");
 
-        var historico = await _repositorioMensagem.ObterHistoricoAsync(remetente, destinatario);
-        return Ok(historico);
+        produtoExistente.Codigo = dto.Codigo;
+        produtoExistente.Descricao = dto.Descricao;
+        produtoExistente.Tipo = dto.Tipo;
+        produtoExistente.ValorFornecedor = dto.ValorFornecedor;
+
+        var sucesso = await _produtoService.AtualizarProduto(produtoExistente);
+        if (!sucesso) return BadRequest("Erro ao atualizar produto.");
+
+        return Ok(produtoExistente.ToResponseDTO());
     }
 
-    /// <summary>
-    /// Obtém a lista de usuários online (simulado). Precisa estar autenticado
-    /// </summary>
-
+    [HttpDelete("{id}")]
     [Authorize]
-    [HttpGet("usuarios-online")]
-    public IActionResult UsuariosOnline()
+    public async Task<IActionResult> Deletar(Guid id)
     {
-        return Ok(ChatHub.ObterUsuariosOnline());
-    }
-}
+        var sucesso = await _produtoService.DeletarProduto(id);
+        if (!sucesso) return NotFound("Produto não encontrado.");
 
-/// <summary>
-/// DTO para enviar mensagens via SignalR.
-/// </summary>
-public class MensagemDto
-{
-    public string Remetente { get; set; }
-    public string Destinatario { get; set; }
-    public string Conteudo { get; set; }
+        return Ok("Produto deletado com sucesso.");
+    }
+
+    [HttpGet("{id}")]
+    [Authorize]
+    public async Task<IActionResult> BuscarPorId(Guid id)
+    {
+        var produto = await _produtoService.BuscarProduto(id);
+        if (produto == null) return NotFound("Produto não encontrado.");
+
+        return Ok(produto.ToResponseDTO());
+    }
+
+    [HttpGet("codigo/{codigo}")]
+    [Authorize]
+    public async Task<IActionResult> BuscarPorCodigo(string codigo)
+    {
+        var produto = await _produtoService.BuscarProduto(codigo);
+        if (produto == null) return NotFound("Produto não encontrado.");
+
+        return Ok(produto.ToResponseDTO());
+    }
+
+    [HttpGet("descricao/{descricao}")]
+    [Authorize]
+    public async Task<IActionResult> BuscarPorDescricao(string descricao)
+    {
+        var produtos = await _produtoService.BuscarProdutos(descricao);
+        var dtos = produtos.Select(p => p.ToResponseDTO());
+
+        return Ok(dtos);
+    }
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> ListarProdutos()
+    {
+        var produtos = await _produtoService.ListarProdutos();
+        return Ok(produtos);
+    }
+
 }

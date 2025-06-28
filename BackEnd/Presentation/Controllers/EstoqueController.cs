@@ -1,74 +1,55 @@
-﻿using ErpProdutos.Domain.Enitities;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 [ApiController]
-[Route("api/erpProdutos")]
+[Route("api/[controller]")]
 public class EstoqueController : ControllerBase
 {
-    private readonly IHubContext<ChatHub> _hubContext;
-    private readonly IRepositorioMensagem _repositorioMensagem;
+    private readonly IEstoqueService _estoqueService;
+    private readonly IProdutoService _produtoService;
 
-   
-    public EstoqueController(IHubContext<ChatHub> hubContext,IRepositorioMensagem repositorioMensagem)
+    public EstoqueController(IEstoqueService estoqueService, IProdutoService produtoService)
     {
-        _hubContext = hubContext;
-        _repositorioMensagem = repositorioMensagem;
+        _estoqueService = estoqueService;
+        _produtoService = produtoService;
     }
 
-    /// <summary>
-    /// Envia uma mensagem para um usuário específico via SignalR. Precisa estar autenticado
-    /// </summary>
-    /// 
-
+    [HttpPost("entrada")]
     [Authorize]
-    [HttpPost("enviar")]
-    public async Task<IActionResult> EnviarMensagem([FromBody] MensagemDto mensagemDto)
+    public async Task<IActionResult> Entrada([FromBody] OperacaoEstoqueRequestDTO dto)
     {
-        
-        await _hubContext.Clients.All.SendAsync("ReceberMensagem", mensagemDto.Remetente, mensagemDto.Conteudo);
-        
-        await _repositorioMensagem.SalvarMensagemAsync(new EntidadeProduto { Remetente = mensagemDto.Remetente, Conteudo = mensagemDto.Conteudo, Destinatario = mensagemDto.Destinatario });
+        var sucesso = await _estoqueService.AdicionarProduto(dto.Codigo, dto.Quantidade);
+        if (!sucesso) return BadRequest("Erro na entrada de estoque.");
 
-        return Ok("Mensagem enviada via SignalR.");
+        return Ok("Entrada realizada com sucesso.");
     }
 
-    /// <summary>
-    /// Consulta histórico de mensagens. Precisa estar autenticado
-    /// </summary>
+    [HttpPost("saida")]
     [Authorize]
-    [HttpGet("historico")]
-    public async Task<IActionResult> ObterHistoricoMensagens([FromQuery] string remetente, [FromQuery] string destinatario)
+    public async Task<IActionResult> Saida([FromBody] OperacaoEstoqueRequestDTO dto)
     {
-        if (string.IsNullOrEmpty(remetente) || string.IsNullOrEmpty(destinatario))
-            return BadRequest("Os parâmetros 'remetente' e 'destinatario' são obrigatórios.");
+        var sucesso = await _estoqueService.RemoverProduto(dto.Codigo, dto.Quantidade);
+        if (!sucesso) return BadRequest("Erro na saída de estoque.");
 
-        var historico = await _repositorioMensagem.ObterHistoricoAsync(remetente, destinatario);
-        return Ok(historico);
+        return Ok("Saída realizada com sucesso.");
     }
 
-    /// <summary>
-    /// Obtém a lista de usuários online (simulado). Precisa estar autenticado
-    /// </summary>
-
+    [HttpGet]
     [Authorize]
-    [HttpGet("usuarios-online")]
-    public IActionResult UsuariosOnline()
+    public async Task<IActionResult> Listar()
     {
-        return Ok(ChatHub.ObterUsuariosOnline());
-    }
-}
+        var estoque = await _estoqueService.ListarEstoque();
+        var response = new List<EstoqueResponseDTO>();
 
-/// <summary>
-/// DTO para enviar mensagens via SignalR.
-/// </summary>
-public class MensagemDto
-{
-    public string Remetente { get; set; }
-    public string Destinatario { get; set; }
-    public string Conteudo { get; set; }
+        foreach (var item in estoque)
+        {
+            var produto = await _produtoService.BuscarProduto(item.ProdutoId);
+            if (produto != null)
+            {
+                response.Add(item.ToResponseDTO(produto));
+            }
+        }
+
+        return Ok(response);
+    }
 }

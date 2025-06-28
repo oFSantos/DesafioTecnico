@@ -1,31 +1,22 @@
-﻿using ErpProdutos.Config;
-using ErpProdutos.Domain.Enitities;
-using ErpProdutos.Domain.Interfaces;
-using ErpProdutos.Domain.Interfaces.Repositorio;
-using System;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ErpProdutos.Domain.Entities;
+using ErpProdutos.Domain.Enums;
 
-public class MovimentacaoService : IAutenticationService
+public class MovimentacaoEstoqueService : IMovimentacaoEstoqueService
 {
-    private readonly IRepositorioUsuario _usuarioRepositorio;
+    private readonly IRepositorioMovimentacaoEstoque _movimentacaoRepository;
 
-    public MovimentacaoService(IRepositorioUsuario usuarioRepositorio)
+    public MovimentacaoEstoqueService(IRepositorioMovimentacaoEstoque movimentacaoRepository)
     {
-        _usuarioRepositorio = usuarioRepositorio;
+        _movimentacaoRepository = movimentacaoRepository;
     }
 
-    public async Task RegistrarAsync(string nomeUsuario, string senha)
+    public async Task<List<EntidadeMovimentacaoEstoque>> ListarMovimentacaoEstoque(TipoMovimento tipoMovimento)
     {
-        var usuarioExistente = await _usuarioRepositorio.BuscarPorNomeAsync(nomeUsuario);
-        if (usuarioExistente != null)
-            throw new Exception("Usuário já existe.");
-
-        var senhaHash = Helper.HashSenha(senha);
-        var usuario = new EntidadeUsuario { NomeUsuario = nomeUsuario, SenhaHash = senhaHash };
-        await _usuarioRepositorio.AdicionarUsuarioAsync(usuario);
+        return await _movimentacaoRepository.ListarMovimentacaoEstoque(tipoMovimento);
     }
 
-  
+    public async Task<bool> RegistrarMovimentacaoEstoque(EntidadeMovimentacaoEstoque movimentacao)
+    {
+        return await _movimentacaoRepository.RegistrarMovimentacaoEstoque(movimentacao);
+    }
 }

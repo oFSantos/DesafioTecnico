@@ -1,0 +1,64 @@
+services:
+  api:
+    build:
+      context: ./BackEnd
+      dockerfile: ./Docker/Dockerfile
+    container_name: erp_api
+    ports:
+      - "5042:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__PostgresSql=Host=postgres;Port=5432;Database=erp_produtos;Username=admin;Password=secretaryship
+      - JwtSettings__Issuer=ErpProdutos
+      - JwtSettings__Audience=ErpProdutos
+      - JwtSettings__Secret=SuaSuperSenhaJWTDe32CaracteresNoMinimo
+    depends_on:
+      - postgres
+    networks:
+      - erp_network
+
+  frontend:
+    build:
+      context: ./FrontEnd
+      dockerfile: Dockerfile
+    container_name: erp_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+    networks:
+      - erp_network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: secretaryship
+      POSTGRES_USER: admin
+      POSTGRES_DB: erp_produtos
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - erp_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: secretaryship
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - erp_network
+
+volumes:
+  postgres-data:
+
+networks:
+  erp_network:
+    driver: bridge

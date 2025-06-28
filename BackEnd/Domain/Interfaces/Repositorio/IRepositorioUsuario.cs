@@ -1,4 +1,4 @@
-﻿using ErpProdutos.Domain.Enitities;
+﻿using ErpProdutos.Domain.Entities;
 
 namespace ErpProdutos.Domain.Interfaces.Repositorio
 {

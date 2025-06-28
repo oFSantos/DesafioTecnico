@@ -1,25 +1,19 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
+# Stage 1 - Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["ErpProdutos.csproj", "."]
-RUN dotnet restore "./././ErpProdutos.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./ErpProdutos.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./ErpProdutos.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+COPY . .  
+
+RUN dotnet restore "ErpProdutos.csproj"
+
+RUN dotnet build "ErpProdutos.csproj" -c Release -o /app/build
+RUN dotnet publish "ErpProdutos.csproj" -c Release -o /app/publish
+
+# Stage 2 - Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+
+EXPOSE 80
+
 ENTRYPOINT ["dotnet", "ErpProdutos.dll"]

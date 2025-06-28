@@ -1,4 +1,4 @@
-﻿using ErpProdutos.Domain.Enitities;
+﻿using ErpProdutos.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ErpProdutos.Infrastructure.Data
@@ -6,9 +6,9 @@ namespace ErpProdutos.Infrastructure.Data
     public class ErpProdutosContext:DbContext
     {
         public ErpProdutosContext(DbContextOptions<ErpProdutosContext> options) : base(options) { }
-        public DbSet<EntidadeProduto> DbProduto { get; set; }
-        public DbSet<EntidadeEstoque> DbEstoque { get; set; }
-        public DbSet<EntidadeMovimentacaoEstoque> DbMovimentacaoEstoque { get; set; }
+        public DbSet<EntidadeProduto> Produto { get; set; }
+        public DbSet<EntidadeEstoque> Estoque { get; set; }
+        public DbSet<EntidadeMovimentacaoEstoque> MovimentacaoEstoque { get; set; }
         public DbSet<EntidadeUsuario> Usuarios { get; set; }        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
